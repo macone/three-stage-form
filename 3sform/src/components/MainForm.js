@@ -123,40 +123,57 @@ export default class MainForm extends Component {
 
 	render() {
 		return (
-			<form>
-				<section className="stage" id="stage-one">
-					<p>Imię <input type="text" name="firstName" value={this.state.firstName} onChange={this.handleChange} onBlur={this.validate} /></p>
-					<p>{this.state.error.firstName}</p>
-					<p>Nazwisko <input type="text" placeholder="Nazwisko" name="lastName" value={this.state.lastName} onChange={this.handleChange} onBlur={this.validate} /></p>
-					<p>{this.state.error.lastName}</p>
-					<p>Email <input type="text" placeholder="Email" name="emailAddress" value={this.state.emailAddress} onChange={this.handleChange} onBlur={this.validate} /></p>
-					<p>{this.state.error.emailAddress}</p>
-				</section>
-				<section className="stage" id="stage-two">
-					<p>Najbardziej polecane państwo do odwiedzenia?
+			<div className="center-children">
+				<div className="tsf-form-parent">
+					<form className="tsf-form">
+						<section className="stage" id="stage-one">
+							<div data-validate={this.state.error.firstName} className={this.state.error.firstName ? "wrap-input alert-validate" : "wrap-input"}>
+								<input className={
+									this.state.firstName ? 'inp has-val' : 'inp'
+								} type="text" name="firstName" value={this.state.firstName} onChange={this.handleChange} onBlur={this.validate} />
+								<span className="focus-input" data-placeholder="Imię"></span>
+							</div>
+							<div data-validate={this.state.error.lastName} className={this.state.error.lastName ? "wrap-input alert-validate" : "wrap-input"}>
+								<input className={
+									this.state.lastName ? 'inp has-val' : 'inp'
+								} type="text" name="lastName" value={this.state.lastName} onChange={this.handleChange} onBlur={this.validate} />
+								<span className="focus-input" data-placeholder="Nazwisko"></span>
+							</div>
+							<div data-validate={this.state.error.emailAddress} className={this.state.error.emailAddress ? "wrap-input alert-validate" : "wrap-input"}>
+								<input className={
+									this.state.emailAddress ? 'inp has-val' : 'inp'
+								} type="text" name="emailAddress" value={this.state.emailAddress} onChange={this.handleChange} onBlur={this.validate} />
+								<span className="focus-input" data-placeholder="Email"></span>
+							</div>
+
+						</section>
+						<section className="stage" id="stage-two">
+							<p>Najbardziej polecane państwo do odwiedzenia?
 						<select value={this.state.bestCountry} onChange={this.handleChange} onBlur={this.validate} name="bestCountry">
-							{
-								Array.from(countries).map((val, ind) => {
-									return <option key={ind} value={val.name_pl}>{val.name_pl} </option>
-								})
-							}
-						</select>
-					</p>
-					<div>Wolisz psy czy koty?
+									{
+										Array.from(countries).map((val, ind) => {
+											return <option key={ind} value={val.name_pl}>{val.name_pl} </option>
+										})
+									}
+								</select>
+							</p>
+							<div>Wolisz psy czy koty?
 						<label><input type="radio" name="favouritePet" value="Koty" onChange={this.handleChange} />Koty </label>
-						<label><input type="radio" name="favouritePet" value="Psy" onChange={this.handleChange} />Psy </label>
-					</div>
-					<div>Szczęśliwa liczba<input type="number" placeholder="Liczba" name="luckyNumber" /></div>
-				</section>
-				<section className="stage" id="stage-three">
-					<div><label>Wyrażam zgodę nr 1 <input type="checkbox" name="legalConsent1" /></label></div>
-					<div><label>Wyrażam zgodę nr 2  <input type="checkbox" name="legalConsent2" /></label></div>
-					<input type="hidden" name="elqFormName" value="recruitment" />
-					<input type="hidden" name="elqSiteID" value="885580810" />
-				</section>
-				<button>Wstecz </button>
-				<button>{this.state.buttonText} </button>
-			</form >
+								<label><input type="radio" name="favouritePet" value="Psy" onChange={this.handleChange} />Psy </label>
+							</div>
+							<div>Szczęśliwa liczba<input type="number" placeholder="Liczba" name="luckyNumber" /></div>
+						</section>
+						<section className="stage" id="stage-three">
+							<div><label>Wyrażam zgodę nr 1 <input type="checkbox" name="legalConsent1" /></label></div>
+							<div><label>Wyrażam zgodę nr 2  <input type="checkbox" name="legalConsent2" /></label></div>
+							<input type="hidden" name="elqFormName" value="recruitment" />
+							<input type="hidden" name="elqSiteID" value="885580810" />
+						</section>
+						<button>Wstecz </button>
+						<button>{this.state.buttonText} </button>
+					</form >
+				</div>
+			</div>
 		);
 	}
 
