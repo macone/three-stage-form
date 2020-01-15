@@ -24,15 +24,19 @@ export default class MainForm extends Component {
 				legalConsent1: "",
 				legalConsent2: "",
 			},
-			finalValidate: false,
-			buttonText: "Dalej",
-			step: 2
+			step: 1
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this._validate = this._validate.bind(this);
 		this.validate = this.validate.bind(this)
 		this._next = this._next.bind(this)
 		this._prev = this._prev.bind(this)
+		this._send = this._send.bind(this)
+	}
+	_send() {
+		let lg1 = (this.state.legalConsent1 && this.state.legalConsent1 !== "off") ? true : false;
+		let lg2 = (this.state.legalConsent2 && this.state.legalConsent2 !== "off") ? true : false;
+		console.log(`https://s885580810.t.eloqua.com/e/f2?firstName=${this.state.firstName}&lastName=${this.state.lastName}&emailAddress=${this.state.emailAddress}&bestCountry=${this.state.bestCountry}&favouritePet=${this.state.favouritePet}&luckyNumber=${this.state.luckyNumber}&legalConsent1=${lg1}&legalConsent2=${lg2}&elqFormName=recruitment&elqSiteID=885580810`)
 	}
 
 	_validate(name, value) {
@@ -126,6 +130,50 @@ export default class MainForm extends Component {
 					}))
 					return false
 				}
+			case "favouritePet":
+				if (value !== "") {
+					this.setState(prevState => ({
+						error: {
+							...prevState.error,
+							favouritePet: ''
+						}
+					}))
+					return true
+				} else {
+					this.setState(prevState => ({
+						error: {
+							...prevState.error,
+							favouritePet: 'Wybierz ulubione zwierzę'
+						}
+					}))
+					return false
+				}
+			case "luckyNumber":
+				if (value !== "" && Number(value) > -1) {
+					this.setState(prevState => ({
+						error: {
+							...prevState.error,
+							luckyNumber: ''
+						}
+					}))
+					return true
+				} else if (Number(value) < 0) {
+					this.setState(prevState => ({
+						error: {
+							...prevState.error,
+							luckyNumber: 'Wybierz liczbę dodatnią'
+						}
+					}))
+					return false
+				} else {
+					this.setState(prevState => ({
+						error: {
+							...prevState.error,
+							luckyNumber: 'Wybierz liczbę'
+						}
+					}))
+					return false
+				}
 		}
 		console.log(this.state)
 	}
@@ -146,7 +194,9 @@ export default class MainForm extends Component {
 		}
 		if (currentStep === 2) {
 			this._validate("bestCountry", this.state.bestCountry)
-			if (this._validate("bestCountry", this.state.bestCountry)) {
+			this._validate("favouritePet", this.state.favouritePet)
+			this._validate("luckyNumber", this.state.luckyNumber)
+			if (this._validate("bestCountry", this.state.bestCountry) && this._validate("favouritePet", this.state.favouritePet) && this._validate("luckyNumber", this.state.luckyNumber)) {
 				currentStep = currentStep >= 2 ? 3 : currentStep + 1
 				this.setState({
 					step: currentStep
@@ -183,6 +233,24 @@ export default class MainForm extends Component {
 			)
 		}
 		return null;
+	}
+
+	get sendButton() {
+		if (this.state.step === 3) {
+			return (
+				<div className="cont-btn">
+					<div className="wrapper-btn">
+						<div className="tsf-bg-btn"></div>
+						<button
+							className="tsf-btn"
+							type="button" onClick={this._send}>
+							Wyślij
+			</button>
+
+					</div>
+				</div>
+			)
+		}
 	}
 
 	get nextButton() {
@@ -255,7 +323,7 @@ export default class MainForm extends Component {
 
 
 						<section className={this.state.step === 2 ? "stage" : "stage fade-out"} id="stage-two">
-							<div data-validate={this.state.error.bestCountry} className={this.state.error.bestCountry ? "alert-validate" : null}>Najbardziej polecane państwo do odwiedzenia?
+							<div data-validate={this.state.error.bestCountry} className={this.state.error.bestCountry ? "sel-par alert-validate" : null}>Najbardziej polecane państwo do odwiedzenia?
 						<select className="select-box" value={this.state.bestCountry} onChange={this.handleChange} onBlur={this.validate} name="bestCountry">
 									{
 										Array.from(countries).map((val, ind) => {
@@ -266,7 +334,7 @@ export default class MainForm extends Component {
 							</div>
 
 
-							<div>Wolisz psy czy koty?
+							<div data-validate={this.state.error.favouritePet} className={this.state.error.favouritePet ? "rad-par alert-validate" : null}>Wolisz psy czy koty?
 						<label className="radio"><input type="radio" name="favouritePet" value="Koty" onChange={this.handleChange} /><span>Koty</span> </label>
 								<label className='radio'><input type="radio" name="favouritePet" value="Psy" onChange={this.handleChange} /><span>Psy</span> </label>
 							</div>
@@ -285,8 +353,24 @@ export default class MainForm extends Component {
 
 
 						<section className={this.state.step === 3 ? "stage" : "stage fade-out"} id="stage-three">
-							<div><label>Wyrażam zgodę nr 1 <input type="checkbox" name="legalConsent1" /></label></div>
-							<div><label>Wyrażam zgodę nr 2  <input type="checkbox" name="legalConsent2" /></label></div>
+							<div className="legal-box">
+								<input type="checkbox" id="cbx" name="legalConsent1" style={{ display: 'none' }} checked={this.state.legalConsent1} onChange={this.handleChange} />Wyrażam zgodę nr 1
+								<label htmlFor="cbx" className="check">
+									<svg width="18px" height="18px" viewBox="0 0 18 18">
+										<path d="M1,9 L1,3.5 C1,2 2,1 3.5,1 L14.5,1 C16,1 17,2 17,3.5 L17,14.5 C17,16 16,17 14.5,17 L3.5,17 C2,17 1,16 1,14.5 L1,9 Z"></path>
+										<polyline points="1 9 7 14 15 4"></polyline>
+									</svg>
+								</label>
+							</div>
+							<div className="legal-box">
+								<input type="checkbox" id="cbx2" name="legalConsent2" style={{ display: 'none' }} checked={this.state.legalConsent2} onChange={this.handleChange} />Wyrażam zgodę nr 2
+								<label htmlFor="cbx2" className="check">
+									<svg width="18px" height="18px" viewBox="0 0 18 18">
+										<path d="M1,9 L1,3.5 C1,2 2,1 3.5,1 L14.5,1 C16,1 17,2 17,3.5 L17,14.5 C17,16 16,17 14.5,17 L3.5,17 C2,17 1,16 1,14.5 L1,9 Z"></path>
+										<polyline points="1 9 7 14 15 4"></polyline>
+									</svg>
+								</label>
+							</div>
 							<input type="hidden" name="elqFormName" value="recruitment" />
 							<input type="hidden" name="elqSiteID" value="885580810" />
 						</section>
@@ -295,20 +379,11 @@ export default class MainForm extends Component {
 
 						{this.previousButton}
 						{this.nextButton}
+						{this.state.step === 3 ? this.sendButton : null}
 					</form >
 				</div>
 			</div>
 		);
 	}
 
-	// render() {
-	// 	return (
-	// 		<form>
-
-	// 			<Step1 firstName={this.state.firstName} lastName={this.state.lastName} emailAddress={this.state.emailAddress} error={this.state.error} />
-	// 			<Step2 />
-	// 			<Step3 />
-	// 		</form>
-	// 	)
-	// }
 }
