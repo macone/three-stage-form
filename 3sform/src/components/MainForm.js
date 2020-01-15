@@ -34,13 +34,55 @@ export default class MainForm extends Component {
 		this._send = this._send.bind(this)
 	}
 	_send() {
-		let lg1 = (this.state.legalConsent1 && this.state.legalConsent1 !== "off") ? true : false;
-		let lg2 = (this.state.legalConsent2 && this.state.legalConsent2 !== "off") ? true : false;
-		console.log(`https://s885580810.t.eloqua.com/e/f2?firstName=${this.state.firstName}&lastName=${this.state.lastName}&emailAddress=${this.state.emailAddress}&bestCountry=${this.state.bestCountry}&favouritePet=${this.state.favouritePet}&luckyNumber=${this.state.luckyNumber}&legalConsent1=${lg1}&legalConsent2=${lg2}&elqFormName=recruitment&elqSiteID=885580810`)
+		if (this.state.legalConsent1 && this.state.legalConsent1) {
+			let lg1 = (this.state.legalConsent1 && this.state.legalConsent1 !== "off") ? true : false;
+			let lg2 = (this.state.legalConsent2 && this.state.legalConsent2 !== "off") ? true : false;
+			let url = `https://s885580810.t.eloqua.com/e/f2?firstName=${this.state.firstName}&lastName=${this.state.lastName}&emailAddress=${this.state.emailAddress}&bestCountry=${this.state.bestCountry}&favouritePet=${this.state.favouritePet}&luckyNumber=${this.state.luckyNumber}&legalConsent1=${lg1}&legalConsent2=${lg2}&elqFormName=recruitment&elqSiteID=885580810`
+			fetch(encodeURI(url))
+				.then(res => {
+					if (res.ok) {
+						this.setState({
+							step: 4
+						})
+					}
+				})
+
+			return true
+		} else {
+			if (!this.state.legalConsent1) {
+				this.setState(prevState => ({
+					error: {
+						...prevState.error,
+						legalConsent1: 'Wszystkie zgody są wymagane'
+					}
+				}))
+			} else {
+				this.setState(prevState => ({
+					error: {
+						...prevState.error,
+						legalConsent1: ''
+					}
+				}))
+			}
+			if (!this.state.legalConsent2) {
+				this.setState(prevState => ({
+					error: {
+						...prevState.error,
+						legalConsent2: 'Wszystkie zgody są wymagane'
+					}
+				}))
+			} else {
+				this.setState(prevState => ({
+					error: {
+						...prevState.error,
+						legalConsent2: ''
+					}
+				}))
+			}
+		}
 	}
 
 	_validate(name, value) {
-		console.log(name)
 		switch (name) {
 			case "firstName":
 				if (value.length < 2) {
@@ -175,11 +217,9 @@ export default class MainForm extends Component {
 					return false
 				}
 		}
-		console.log(this.state)
 	}
 
 	_next() {
-		console.log(this.state)
 		let currentStep = this.state.step
 		if (currentStep === 1) {
 			this._validate("firstName", this.state.firstName)
@@ -191,8 +231,7 @@ export default class MainForm extends Component {
 					step: currentStep
 				})
 			}
-		}
-		if (currentStep === 2) {
+		} else if (currentStep === 2) {
 			this._validate("bestCountry", this.state.bestCountry)
 			this._validate("favouritePet", this.state.favouritePet)
 			this._validate("luckyNumber", this.state.luckyNumber)
@@ -280,7 +319,6 @@ export default class MainForm extends Component {
 	}
 
 	handleChange(event) {
-		console.log(event.target)
 		this.setState({ [event.target.name]: event.target.value });
 	}
 
@@ -289,7 +327,6 @@ export default class MainForm extends Component {
 		if (this) {
 			this._validate(name, value)
 		}
-
 	}
 
 
@@ -353,7 +390,7 @@ export default class MainForm extends Component {
 
 
 						<section className={this.state.step === 3 ? "stage" : "stage fade-out"} id="stage-three">
-							<div className="legal-box">
+							<div data-validate={this.state.error.legalConsent1} className={this.state.error.legalConsent1 ? "legal-box alert-validate" : "legal-box"}>
 								<input type="checkbox" id="cbx" name="legalConsent1" style={{ display: 'none' }} checked={this.state.legalConsent1} onChange={this.handleChange} />Wyrażam zgodę nr 1
 								<label htmlFor="cbx" className="check">
 									<svg width="18px" height="18px" viewBox="0 0 18 18">
@@ -362,7 +399,7 @@ export default class MainForm extends Component {
 									</svg>
 								</label>
 							</div>
-							<div className="legal-box">
+							<div data-validate={this.state.error.legalConsent2} className={this.state.error.legalConsent2 ? "legal-box alert-validate" : "legal-box"}>
 								<input type="checkbox" id="cbx2" name="legalConsent2" style={{ display: 'none' }} checked={this.state.legalConsent2} onChange={this.handleChange} />Wyrażam zgodę nr 2
 								<label htmlFor="cbx2" className="check">
 									<svg width="18px" height="18px" viewBox="0 0 18 18">
@@ -374,12 +411,13 @@ export default class MainForm extends Component {
 							<input type="hidden" name="elqFormName" value="recruitment" />
 							<input type="hidden" name="elqSiteID" value="885580810" />
 						</section>
-
+						{this.state.step === 4 ? (<section className="flex-center"> Formularz został wysłany</section>) : null}
 
 
 						{this.previousButton}
 						{this.nextButton}
 						{this.state.step === 3 ? this.sendButton : null}
+
 					</form >
 				</div>
 			</div>
